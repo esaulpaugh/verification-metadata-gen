@@ -20,6 +20,7 @@ import com.esaulpaugh.headlong.util.FastHex;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -468,27 +469,37 @@ public class ParserGenerator {
         final String artifactUrl = repoUrl + group.replace('.', '/') + '/' + name + '/' + version + '/' + artifactName;
         final String componentKey = group + ':' + name + ':' + version;
         components.computeIfAbsent(componentKey, key -> new Component(group, name, version, new ArrayList<>()))
-                .artifacts.add(new Artifact(artifactName, hash(artifactUrl, md), origin));
+                .artifacts.add(new Artifact(artifactName, getHash(artifactUrl, md, false), origin));
     }
 
-    private static String hash(String artifactUrl, MessageDigest md) throws IOException {
-//        System.out.println("ARTIFACT_URL " + artifactUrl);
-        HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl).openConnection();
+    private static String getHash(String artifactUrl, MessageDigest md, final boolean forceHash) throws IOException {
+        if(forceHash) {
+            System.out.println("HASHING " + artifactUrl);
+        }
+        HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + (forceHash ? "" : ".sha256")).openConnection();
         conn.setConnectTimeout(230);
         conn.setReadTimeout(900);
         conn.setDoInput(true);
         try (InputStream is = conn.getInputStream()) {
 //            System.out.println(conn.getCipherSuite());
+            StringBuilder sb = new StringBuilder();
             byte[] buffer = new byte[4096];
             BufferedInputStream bis = new BufferedInputStream(is);
             int read;
-            while ((read = bis.read(buffer)) != -1) {
-                md.update(buffer, 0, read);
+            if(forceHash) {
+                while ((read = bis.read(buffer)) != -1) md.update(buffer, 0, read);
+            } else {
+                while ((read = bis.read(buffer)) != -1) sb.append(new String(buffer, 0, read));
             }
-            if(conn.getResponseCode() != 200) {
-                throw new IOException(conn.getResponseMessage() + "\n" + conn.getResponseMessage());
+            if(!forceHash) {
+                System.out.println("FOUND HASH " + artifactUrl);
             }
-            return FastHex.encodeToString(md.digest());
+            return forceHash ? FastHex.encodeToString(md.digest()) : sb.toString();
+        } catch (FileNotFoundException fnfe) {
+            if(!forceHash && conn.getResponseCode() == 404) {
+                return getHash(artifactUrl, md, true);
+            }
+            throw fnfe;
         } finally {
             md.reset();
             conn.disconnect();
