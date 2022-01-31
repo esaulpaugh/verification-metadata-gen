@@ -441,7 +441,7 @@ public class ParserGenerator {
 
     public static void main(String[] args0) throws IOException, NoSuchAlgorithmException {
         final ConcurrentHashMap<String, Component> components = new ConcurrentHashMap<>(128);
-        try (BufferedReader br = new BufferedReader(new StringReader(FAILED_ARTIFACTS_3))) {
+        try (BufferedReader br = new BufferedReader(new StringReader(ERRS_7))) {
             final MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
             String line;
             while((line = br.readLine()) != null) {
@@ -469,37 +469,43 @@ public class ParserGenerator {
         final String artifactUrl = repoUrl + group.replace('.', '/') + '/' + name + '/' + version + '/' + artifactName;
         final String componentKey = group + ':' + name + ':' + version;
         components.computeIfAbsent(componentKey, key -> new Component(group, name, version, new ArrayList<>()))
-                .artifacts.add(new Artifact(artifactName, getHash(artifactUrl, md, false), origin));
+                .artifacts.add(new Artifact(artifactName, getHash(artifactUrl, md), origin));
     }
 
-    private static String getHash(String artifactUrl, MessageDigest md, final boolean forceHash) throws IOException {
-        if(forceHash) {
-            System.out.println("HASHING " + artifactUrl);
-        }
-        HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + (forceHash ? "" : ".sha256")).openConnection();
-        conn.setConnectTimeout(230);
-        conn.setReadTimeout(900);
-        conn.setDoInput(true);
-        try (InputStream is = conn.getInputStream()) {
-//            System.out.println(conn.getCipherSuite());
+    private static String getHash(final String artifactUrl, final MessageDigest md) throws IOException {
+        HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + ".sha256").openConnection();
+        conn.setConnectTimeout(210);
+        conn.setReadTimeout(100);
+        try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
             StringBuilder sb = new StringBuilder();
             byte[] buffer = new byte[4096];
-            BufferedInputStream bis = new BufferedInputStream(is);
             int read;
-            if(forceHash) {
-                while ((read = bis.read(buffer)) != -1) md.update(buffer, 0, read);
-            } else {
-                while ((read = bis.read(buffer)) != -1) sb.append(new String(buffer, 0, read));
-            }
-            if(!forceHash) {
-                System.out.println("FOUND HASH " + artifactUrl);
-            }
-            return forceHash ? FastHex.encodeToString(md.digest()) : sb.toString();
+            while ((read = bis.read(buffer)) != -1)
+                sb.append(new String(buffer, 0, read));
+            System.out.println("FOUND HASH\t" + artifactUrl);
+            return sb.toString();
         } catch (FileNotFoundException fnfe) {
-            if(!forceHash && conn.getResponseCode() == 404) {
-                return getHash(artifactUrl, md, true);
+            if(conn.getResponseCode() == 404) {
+                return downloadAndHash(artifactUrl, md);
             }
             throw fnfe;
+        } finally {
+            md.reset();
+            conn.disconnect();
+        }
+    }
+
+    private static String downloadAndHash(final String artifactUrl, final MessageDigest md) throws IOException {
+        HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl).openConnection();
+        conn.setConnectTimeout(210);
+        conn.setReadTimeout(900);
+        try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = bis.read(buffer)) != -1)
+                md.update(buffer, 0, read);
+            System.out.println("HASHED\t\t" + artifactUrl);
+            return FastHex.encodeToString(md.digest());
         } finally {
             md.reset();
             conn.disconnect();
