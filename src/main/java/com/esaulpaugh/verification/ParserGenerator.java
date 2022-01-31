@@ -18,14 +18,18 @@ package com.esaulpaugh.verification;
 import com.esaulpaugh.headlong.util.FastHex;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ParserGenerator {
 
@@ -434,21 +438,16 @@ public class ParserGenerator {
     private static final String MAVEN_ORIGIN = MAVEN_CENTRAL_URL.replace("https://", "");
     private static final String GOOGLE_ORIGIN = GOOGLE_URL.replace("https://", "");
 
-    private static final String NAME_END = ":";
-    private static final String GROUP_END = ":";
-    private static final String ARTIFACT_END = " (";
-
     public static void main(String[] args0) throws IOException, NoSuchAlgorithmException {
-        final HashMap<String, Component> components = new HashMap<>(128);
+        final ConcurrentHashMap<String, Component> components = new ConcurrentHashMap<>(128);
         try (BufferedReader br = new BufferedReader(new StringReader(FAILED_ARTIFACTS_3))) {
             final MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
             String line;
             while((line = br.readLine()) != null) {
-                int versionEnd;
-                if((versionEnd = line.indexOf(") from repository MavenRepo")) >= 0) {
-                    addArtifact(components, line, versionEnd, MAVEN_ORIGIN, MAVEN_CENTRAL_URL, sha256);
-                } else if((versionEnd = line.indexOf(") from repository Google")) >= 0) {
-                    addArtifact(components, line, versionEnd, GOOGLE_ORIGIN, GOOGLE_URL, sha256);
+                if(line.indexOf(") from repository MavenRepo") > 0) {
+                    addArtifact(line, MAVEN_CENTRAL_URL, sha256, MAVEN_ORIGIN, components);
+                } else if(line.indexOf(") from repository Google") > 0) {
+                    addArtifact(line, GOOGLE_URL, sha256, GOOGLE_ORIGIN, components);
                 } else {
                     System.err.println("skipping " + line);
                 }
@@ -460,35 +459,19 @@ public class ParserGenerator {
         System.out.println(sb);
     }
 
-    private static void addArtifact(Map<String, Component> components, String line, int versionEnd, String origin, String repoUrl, MessageDigest md) throws IOException {
-        int nameEnd = line.lastIndexOf(NAME_END, versionEnd - 1);
-        int groupEnd = line.lastIndexOf(GROUP_END, nameEnd - 1);
-        int artifactEnd = line.lastIndexOf(ARTIFACT_END, nameEnd - 1);
-        int artifactStart = line.lastIndexOf(" ", artifactEnd - 1);
-        String group = line.substring(artifactEnd + ARTIFACT_END.length(), groupEnd);
-        String name = line.substring(groupEnd + GROUP_END.length(), nameEnd);
-        String version = line.substring(nameEnd + NAME_END.length(), versionEnd);
-        String artifactName = line.substring(artifactStart + " ".length(), artifactEnd);
-        String artifactHash = hash(buildDirUrl(repoUrl, group, name, version), artifactName, md);
-        String componentName = line.substring(artifactEnd + ARTIFACT_END.length(), versionEnd);
-        Component component = components.computeIfAbsent(componentName, key -> {
-            List<Artifact> artifacts = new ArrayList<>();
-            Component c = new Component(group, name, version, artifacts);
-            components.put(componentName, c);
-            return c;
-        });
-        component.artifacts.add(new Artifact(artifactName, artifactHash, origin));
+    private static void addArtifact(String line, String repoUrl, MessageDigest md, String origin, Map<String, Component> components) throws IOException {
+        final String[] parts = line.split("- |:| \\(|\\) ");
+        final String artifactName = parts[1];
+        final String group = parts[2];
+        final String name = parts[3];
+        final String version = parts[4];
+        final String artifactUrl = repoUrl + group.replace('.', '/') + '/' + name + '/' + version + '/' + artifactName;
+        final String componentKey = group + ':' + name + ':' + version;
+        components.computeIfAbsent(componentKey, key -> new Component(group, name, version, new ArrayList<>()))
+                .artifacts.add(new Artifact(artifactName, hash(artifactUrl, md), origin));
     }
 
-    private static String buildDirUrl(String base, String group, String name, String version) {
-        return base
-                + group.replace('.', '/')
-                + '/' + name // .replace('.', '/')
-                + '/' + version + '/';
-    }
-
-    private static String hash(String dirUrl, String artifact, MessageDigest md) throws IOException {
-        String artifactUrl = dirUrl + artifact;
+    private static String hash(String artifactUrl, MessageDigest md) throws IOException {
 //        System.out.println("ARTIFACT_URL " + artifactUrl);
         HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl).openConnection();
         conn.setConnectTimeout(230);
