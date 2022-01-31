@@ -473,8 +473,8 @@ public class ParserGenerator {
 
     private static String getHash(final String artifactUrl, final MessageDigest md) throws IOException {
         HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + ".sha256").openConnection();
-        conn.setConnectTimeout(210);
-        conn.setReadTimeout(100);
+        conn.setConnectTimeout(300);
+        conn.setReadTimeout(250);
         try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
             StringBuilder sb = new StringBuilder();
             byte[] buffer = new byte[4096];
@@ -495,7 +495,7 @@ public class ParserGenerator {
 
     private static String downloadAndHash(final String artifactUrl, final MessageDigest md) throws IOException {
         HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl).openConnection();
-        conn.setConnectTimeout(210);
+        conn.setConnectTimeout(300);
         conn.setReadTimeout(900);
         try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
             byte[] buffer = new byte[4096];
