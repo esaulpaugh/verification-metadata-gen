@@ -22,7 +22,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -490,7 +489,6 @@ public class ParserGenerator {
             }
             throw fnfe;
         } finally {
-            md.reset();
             conn.disconnect();
         }
     }
