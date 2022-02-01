@@ -488,10 +488,11 @@ public class ParserGenerator {
 
     private static void addArtifact(String line, String repoUrl, MessageDigest md, String origin, Map<String, Component> components) throws IOException {
         final String[] parts = line.split("- |:| \\(|\\) ");
-        final String artifactName = parts[1];
-        final String group = parts[2];
-        final String name = parts[3];
-        final String version = parts[4];
+        final int start = parts.length - 5;
+        final String artifactName = parts[start];
+        final String group = parts[start+1];
+        final String name = parts[start+2];
+        final String version = parts[start+3];
         final String artifactUrl = repoUrl + group.replace('.', '/') + '/' + name + '/' + version + '/' + artifactName;
         final String componentKey = group + ':' + name + ':' + version;
         components.computeIfAbsent(componentKey, key -> new Component(group, name, version, new ArrayList<>()))
