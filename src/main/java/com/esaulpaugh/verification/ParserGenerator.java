@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -438,10 +439,15 @@ public class ParserGenerator {
     private static final String MAVEN_ORIGIN = MAVEN_CENTRAL_URL.replace("https://", "");
     private static final String GOOGLE_ORIGIN = GOOGLE_URL.replace("https://", "");
 
+    private static final int DIGEST_LEN_BITS = 256;
+    private static final int DIGEST_LEN_BYTES = DIGEST_LEN_BITS / Byte.SIZE;
+    private static final int DIGEST_HEX_CHARS = DIGEST_LEN_BITS / FastHex.BITS_PER_CHAR;
+    private static final String DIGEST_ALGORITHM = "SHA-" + DIGEST_LEN_BITS;
+
     public static void main(String[] args0) throws IOException, NoSuchAlgorithmException {
         final ConcurrentHashMap<String, Component> components = new ConcurrentHashMap<>(128);
         try (BufferedReader br = new BufferedReader(new StringReader(ERRS_7))) {
-            final MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            final MessageDigest sha256 = newMessageDigest();
             String line;
             while((line = br.readLine()) != null) {
                 if(line.indexOf(") from repository MavenRepo") > 0) {
@@ -459,6 +465,14 @@ public class ParserGenerator {
         System.out.println(sb);
     }
 
+    private static MessageDigest newMessageDigest() throws NoSuchAlgorithmException {
+        final MessageDigest md = MessageDigest.getInstance(DIGEST_ALGORITHM);
+        final int len = md.getDigestLength();
+        if (len * FastHex.CHARS_PER_BYTE != DIGEST_HEX_CHARS) throw new Error("bad constants: " + FastHex.CHARS_PER_BYTE + " and " + DIGEST_HEX_CHARS);
+        if (len != DIGEST_LEN_BYTES) throw new Error("bad init: " + len + " != " + DIGEST_LEN_BYTES);
+        return md;
+    }
+
     private static void addArtifact(String line, String repoUrl, MessageDigest md, String origin, Map<String, Component> components) throws IOException {
         final String[] parts = line.split("- |:| \\(|\\) ");
         final String artifactName = parts[1];
@@ -472,25 +486,31 @@ public class ParserGenerator {
     }
 
     private static String getHash(final String artifactUrl, final MessageDigest md) throws IOException {
-        HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + ".sha256").openConnection();
+        final HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + ".sha256").openConnection();
         conn.setConnectTimeout(300);
         conn.setReadTimeout(250);
+        boolean hashNotFound = false;
         try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
-            StringBuilder sb = new StringBuilder();
-            byte[] buffer = new byte[4096];
-            int read;
-            while ((read = bis.read(buffer)) != -1)
-                sb.append(new String(buffer, 0, read));
-            System.out.println("FOUND HASH\t" + artifactUrl);
-            return sb.toString();
+            return readHash(bis);
         } catch (FileNotFoundException fnfe) {
-            if(conn.getResponseCode() == 404) {
+            hashNotFound = true;
+            if (conn.getResponseCode() == 404) {
                 return downloadAndHash(artifactUrl, md);
             }
             throw fnfe;
         } finally {
             conn.disconnect();
+            System.out.println((hashNotFound ? "HASHED\t\t" : "FOUND HASH\t") + artifactUrl);
         }
+    }
+
+    private static String readHash(InputStream bis) throws IOException {
+        final byte[] buffer = new byte[DIGEST_HEX_CHARS];
+        final int read = bis.read(buffer);
+        if (read != buffer.length) throw new Error("bad read: " + read + " != " + buffer.length);
+        final String hash = new String(buffer, 0, read);
+        if (bis.read(buffer) != -1) throw new Error("not -1");
+        return hash;
     }
 
     private static String downloadAndHash(final String artifactUrl, final MessageDigest md) throws IOException {
@@ -502,7 +522,6 @@ public class ParserGenerator {
             int read;
             while ((read = bis.read(buffer)) != -1)
                 md.update(buffer, 0, read);
-            System.out.println("HASHED\t\t" + artifactUrl);
             return FastHex.encodeToString(md.digest());
         } finally {
             md.reset();
