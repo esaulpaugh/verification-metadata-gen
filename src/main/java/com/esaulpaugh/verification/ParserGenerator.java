@@ -433,6 +433,19 @@ public class ParserGenerator {
             "    - junit-platform-engine-1.8.2.jar (org.junit.platform:junit-platform-engine:1.8.2) from repository MavenRepo\n" +
             "    - junit-platform-engine-1.8.2.module (org.junit.platform:junit-platform-engine:1.8.2) from repository MavenRepo";
 
+    private static final String ERRS_9 =
+            "  - commons-math3-3.2.jar (org.apache.commons:commons-math3:3.2) from repository MavenRepo\n" +
+            "  - jmh-core-1.34.jar (org.openjdk.jmh:jmh-core:1.34) from repository MavenRepo\n" +
+            "  - jmh-generator-annprocess-1.34.jar (org.openjdk.jmh:jmh-generator-annprocess:1.34) from repository MavenRepo\n" +
+            "  - jopt-simple-5.0.4.jar (net.sf.jopt-simple:jopt-simple:5.0.4) from repository MavenRepo\n" +
+            "  - bcprov-ext-jdk15on-1.70.jar (org.bouncycastle:bcprov-ext-jdk15on:1.70) from repository MavenRepo\n" +
+            "  - commons-codec-1.15.jar (commons-codec:commons-codec:1.15) from repository MavenRepo\n" +
+            "  - bcprov-ext-jdk15on-1.70-sources.jar (org.bouncycastle:bcprov-ext-jdk15on:1.70) from repository MavenRepo\n" +
+            "  - commons-codec-1.15-sources.jar (commons-codec:commons-codec:1.15) from repository MavenRepo\n" +
+            "  - commons-math3-3.2-sources.jar (org.apache.commons:commons-math3:3.2) from repository MavenRepo\n" +
+            "  - jmh-core-1.34-sources.jar (org.openjdk.jmh:jmh-core:1.34) from repository MavenRepo\n" +
+            "  - jopt-simple-5.0.4-sources.jar (net.sf.jopt-simple:jopt-simple:5.0.4) from repository MavenRepo";
+
     private static final String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2/";
     private static final String GOOGLE_URL = "https://dl.google.com/dl/android/maven2/";
 
