@@ -446,11 +446,78 @@ public class ParserGenerator {
             "  - jmh-core-1.34-sources.jar (org.openjdk.jmh:jmh-core:1.34) from repository MavenRepo\n" +
             "  - jopt-simple-5.0.4-sources.jar (net.sf.jopt-simple:jopt-simple:5.0.4) from repository MavenRepo";
 
+    private static final String ERRS_10 = "  - apache-13.pom (org.apache:apache:13) from repository MavenRepo\n" +
+            "  - apache-23.pom (org.apache:apache:23) from repository MavenRepo\n" +
+            "  - apiguardian-api-1.1.2.module (org.apiguardian:apiguardian-api:1.1.2) from repository MavenRepo\n" +
+            "  - bcprov-jdk15on-1.70.pom (org.bouncycastle:bcprov-jdk15on:1.70) from repository MavenRepo\n" +
+            "  - commons-codec-1.15.pom (commons-codec:commons-codec:1.15) from repository MavenRepo\n" +
+            "  - commons-math3-3.2.jar (org.apache.commons:commons-math3:3.2) from repository MavenRepo\n" +
+            "  - commons-math3-3.2.pom (org.apache.commons:commons-math3:3.2) from repository MavenRepo\n" +
+            "  - commons-parent-28.pom (org.apache.commons:commons-parent:28) from repository MavenRepo\n" +
+            "  - commons-parent-52.pom (org.apache.commons:commons-parent:52) from repository MavenRepo\n" +
+            "  - gson-2.8.9.pom (com.google.code.gson:gson:2.8.9) from repository MavenRepo\n" +
+            "  - gson-parent-2.8.9.pom (com.google.code.gson:gson-parent:2.8.9) from repository MavenRepo\n" +
+            "  - jmh-core-1.34.jar (org.openjdk.jmh:jmh-core:1.34) from repository MavenRepo\n" +
+            "  - jmh-core-1.34.pom (org.openjdk.jmh:jmh-core:1.34) from repository MavenRepo\n" +
+            "  - jmh-generator-annprocess-1.34.jar (org.openjdk.jmh:jmh-generator-annprocess:1.34) from repository MavenRepo\n" +
+            "  - jmh-generator-annprocess-1.34.pom (org.openjdk.jmh:jmh-generator-annprocess:1.34) from repository MavenRepo\n" +
+            "  - jmh-parent-1.34.pom (org.openjdk.jmh:jmh-parent:1.34) from repository MavenRepo\n" +
+            "  - jopt-simple-5.0.4.jar (net.sf.jopt-simple:jopt-simple:5.0.4) from repository MavenRepo\n" +
+            "  - jopt-simple-5.0.4.pom (net.sf.jopt-simple:jopt-simple:5.0.4) from repository MavenRepo\n" +
+            "  - junit-bom-5.8.2.module (org.junit:junit-bom:5.8.2) from repository MavenRepo\n" +
+            "  - junit-jupiter-api-5.8.2.module (org.junit.jupiter:junit-jupiter-api:5.8.2) from repository MavenRepo\n" +
+            "  - junit-jupiter-engine-5.8.2.module (org.junit.jupiter:junit-jupiter-engine:5.8.2) from repository MavenRepo\n" +
+            "  - junit-platform-commons-1.8.2.module (org.junit.platform:junit-platform-commons:1.8.2) from repository MavenRepo\n" +
+            "  - junit-platform-engine-1.8.2.module (org.junit.platform:junit-platform-engine:1.8.2) from repository MavenRepo\n" +
+            "  - opentest4j-1.2.0.pom (org.opentest4j:opentest4j:1.2.0) from repository MavenRepo\n" +
+            "  - oss-parent-7.pom (org.sonatype.oss:oss-parent:7) from repository MavenRepo\n" +
+            "  - bcprov-jdk15on-1.70.jar (org.bouncycastle:bcprov-jdk15on:1.70) from repository MavenRepo\n" +
+            "  - commons-codec-1.15.jar (commons-codec:commons-codec:1.15) from repository MavenRepo\n" +
+            "  - bcprov-jdk15on-1.70-sources.jar (org.bouncycastle:bcprov-jdk15on:1.70) from repository MavenRepo\n" +
+            "  - commons-codec-1.15-sources.jar (commons-codec:commons-codec:1.15) from repository MavenRepo\n" +
+            "  - commons-math3-3.2-sources.jar (org.apache.commons:commons-math3:3.2) from repository MavenRepo\n" +
+            "  - jmh-core-1.34-sources.jar (org.openjdk.jmh:jmh-core:1.34) from repository MavenRepo\n" +
+            "  - jopt-simple-5.0.4-sources.jar (net.sf.jopt-simple:jopt-simple:5.0.4) from repository MavenRepo";
+
+    private static final String ERRS_11 = "  - gson-2.8.9.jar (com.google.code.gson:gson:2.8.9) from repository MavenRepo\n" +
+            "  - gson-2.8.9-sources.jar (com.google.code.gson:gson:2.8.9) from repository MavenRepo";
+
+    private static final String ERRS_12 = "  - apiguardian-api-1.1.2.jar (org.apiguardian:apiguardian-api:1.1.2) from repository MavenRepo\n" +
+            "  - junit-jupiter-api-5.8.2.jar (org.junit.jupiter:junit-jupiter-api:5.8.2) from repository MavenRepo\n" +
+            "  - junit-platform-commons-1.8.2.jar (org.junit.platform:junit-platform-commons:1.8.2) from repository MavenRepo\n" +
+            "  - opentest4j-1.2.0.jar (org.opentest4j:opentest4j:1.2.0) from repository MavenRepo\n" +
+            "  - apiguardian-api-1.1.2-sources.jar (org.apiguardian:apiguardian-api:1.1.2) from repository MavenRepo\n" +
+            "  - junit-jupiter-api-5.8.2-sources.jar (org.junit.jupiter:junit-jupiter-api:5.8.2) from repository MavenRepo\n" +
+            "  - junit-platform-commons-1.8.2-sources.jar (org.junit.platform:junit-platform-commons:1.8.2) from repository MavenRepo\n" +
+            "  - opentest4j-1.2.0-sources.jar (org.opentest4j:opentest4j:1.2.0) from repository MavenRepo";
+
+    private static final String ERRS_13 = "  - junit-jupiter-engine-5.8.2-sources.jar (org.junit.jupiter:junit-jupiter-engine:5.8.2) from repository MavenRepo\n" +
+            "  - junit-platform-engine-1.8.2-sources.jar (org.junit.platform:junit-platform-engine:1.8.2) from repository MavenRepo";
+
+    private static final String ONE = "  - jmh-core-1.29-sources.jar (org.openjdk.jmh:jmh-core:1.29) from repository Gradle Central Plugin Repository\n" +
+            "  - jopt-simple-4.6-sources.jar (net.sf.jopt-simple:jopt-simple:4.6) from repository Gradle Central Plugin Repository\n" +
+            "  - asm-9.0.module (org.ow2.asm:asm:9.0) from repository MavenRepo\n" +
+            "  - jmh-generator-asm-1.29.pom (org.openjdk.jmh:jmh-generator-asm:1.29) from repository MavenRepo\n" +
+            "  - jmh-generator-bytecode-1.29.pom (org.openjdk.jmh:jmh-generator-bytecode:1.29) from repository MavenRepo\n" +
+            "  - jmh-generator-reflection-1.29.pom (org.openjdk.jmh:jmh-generator-reflection:1.29) from repository MavenRepo\n" +
+            "  - asm-9.0.jar (org.ow2.asm:asm:9.0) from repository MavenRepo\n" +
+            "  - jmh-generator-asm-1.29.jar (org.openjdk.jmh:jmh-generator-asm:1.29) from repository MavenRepo\n" +
+            "  - jmh-generator-bytecode-1.29.jar (org.openjdk.jmh:jmh-generator-bytecode:1.29) from repository MavenRepo\n" +
+            "  - jmh-generator-reflection-1.29.jar (org.openjdk.jmh:jmh-generator-reflection:1.29) from repository MavenRepo\n" +
+            "  - asm-9.0-sources.jar (org.ow2.asm:asm:9.0) from repository MavenRepo\n" +
+            "  - jmh-core-1.29-sources.jar (org.openjdk.jmh:jmh-core:1.29) from repository MavenRepo\n" +
+            "  - jmh-generator-asm-1.29-sources.jar (org.openjdk.jmh:jmh-generator-asm:1.29) from repository MavenRepo\n" +
+            "  - jmh-generator-bytecode-1.29-sources.jar (org.openjdk.jmh:jmh-generator-bytecode:1.29) from repository MavenRepo\n" +
+            "  - jmh-generator-reflection-1.29-sources.jar (org.openjdk.jmh:jmh-generator-reflection:1.29) from repository MavenRepo\n" +
+            "  - jopt-simple-4.6-sources.jar (net.sf.jopt-simple:jopt-simple:4.6) from repository MavenRepo";
+
     private static final String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2/";
     private static final String GOOGLE_URL = "https://dl.google.com/dl/android/maven2/";
+    private static final String GRADLE_URL = "https://plugins.gradle.org/m2/";
 
     private static final String MAVEN_ORIGIN = MAVEN_CENTRAL_URL.replace("https://", "");
     private static final String GOOGLE_ORIGIN = GOOGLE_URL.replace("https://", "");
+    private static final String GRADLE_ORIGIN = GRADLE_URL.replace("https://", "");
 
     private static final int DIGEST_LEN_BITS = 256;
     private static final int DIGEST_LEN_BYTES = DIGEST_LEN_BITS / Byte.SIZE;
@@ -459,7 +526,7 @@ public class ParserGenerator {
 
     public static void main(String[] args0) throws IOException, NoSuchAlgorithmException {
         final ConcurrentHashMap<String, Component> components = new ConcurrentHashMap<>(128);
-        try (BufferedReader br = new BufferedReader(new StringReader(ERRS_7))) {
+        try (BufferedReader br = new BufferedReader(new StringReader(ONE))) {
             final MessageDigest sha256 = newMessageDigest();
             String line;
             while((line = br.readLine()) != null) {
@@ -467,6 +534,8 @@ public class ParserGenerator {
                     addArtifact(line, MAVEN_CENTRAL_URL, sha256, MAVEN_ORIGIN, components);
                 } else if(line.indexOf(") from repository Google") > 0) {
                     addArtifact(line, GOOGLE_URL, sha256, GOOGLE_ORIGIN, components);
+                } else if(line.indexOf("Gradle Central Plugin Repository") > 0) {
+                    addArtifact(line, GRADLE_URL, sha256, GRADLE_ORIGIN, components);
                 } else {
                     System.err.println("skipping " + line);
                 }
