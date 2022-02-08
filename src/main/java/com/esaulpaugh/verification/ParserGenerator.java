@@ -534,7 +534,7 @@ public class ParserGenerator {
                     addArtifact(line, MAVEN_CENTRAL_URL, sha256, MAVEN_ORIGIN, components);
                 } else if(line.indexOf(") from repository Google") > 0) {
                     addArtifact(line, GOOGLE_URL, sha256, GOOGLE_ORIGIN, components);
-                } else if(line.indexOf("Gradle Central Plugin Repository") > 0) {
+                } else if(line.indexOf(") from repository Gradle Central Plugin Repository") > 0) {
                     addArtifact(line, GRADLE_URL, sha256, GRADLE_ORIGIN, components);
                 } else {
                     System.err.println("skipping " + line);
@@ -576,8 +576,8 @@ public class ParserGenerator {
         try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
             return readHash(bis);
         } catch (FileNotFoundException fnfe) {
-            hashNotFound = true;
             if (conn.getResponseCode() == 404) {
+                hashNotFound = true;
                 return downloadAndHash(artifactUrl, md);
             }
             throw fnfe;
