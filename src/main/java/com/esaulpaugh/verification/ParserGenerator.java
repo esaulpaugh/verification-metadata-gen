@@ -532,6 +532,8 @@ public class ParserGenerator {
             while((line = br.readLine()) != null) {
                 if(line.indexOf(") from repository MavenRepo") > 0) {
                     addArtifact(line, MAVEN_CENTRAL_URL, sha256, MAVEN_ORIGIN, components);
+                } if(line.indexOf(") from repository MavenLocal") > 0) {
+                    addArtifact(line, MAVEN_CENTRAL_URL, sha256, MAVEN_ORIGIN, components);
                 } else if(line.indexOf(") from repository Google") > 0) {
                     addArtifact(line, GOOGLE_URL, sha256, GOOGLE_ORIGIN, components);
                 } else if(line.indexOf(") from repository Gradle Central Plugin Repository") > 0) {
