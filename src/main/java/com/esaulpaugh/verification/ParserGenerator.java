@@ -573,7 +573,7 @@ public class ParserGenerator {
     private static String getHash(final String artifactUrl, final MessageDigest md) throws IOException {
         final HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + ".sha256").openConnection();
         conn.setConnectTimeout(300);
-        conn.setReadTimeout(250);
+        conn.setReadTimeout(435);
         boolean hashNotFound = false;
         try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
             return readHash(bis);
