@@ -594,7 +594,12 @@ public class ParserGenerator {
         final int read = bis.read(buffer);
         if (read != buffer.length) throw new Error("bad read: " + read + " != " + buffer.length);
         final String hash = new String(buffer, 0, read);
-        if (bis.read(buffer) != -1) throw new Error("not -1");
+        int by = bis.read();
+        if (by != -1) {
+            if (by != 10 || bis.read() != -1) {
+                throw new Error("not -1");
+            }
+        }
         return hash;
     }
 
