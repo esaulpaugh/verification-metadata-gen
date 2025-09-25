@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -572,6 +573,7 @@ public class ParserGenerator {
 
     private static String getHash(final String artifactUrl, final MessageDigest md) throws IOException {
         final HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl + ".sha256").openConnection();
+        conn.setInstanceFollowRedirects(true);
         conn.setConnectTimeout(300);
         conn.setReadTimeout(435);
         boolean hashNotFound = false;
@@ -604,15 +606,20 @@ public class ParserGenerator {
     }
 
     private static String downloadAndHash(final String artifactUrl, final MessageDigest md) throws IOException {
-        HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl).openConnection();
+        final HttpsURLConnection conn = (HttpsURLConnection) new URL(artifactUrl).openConnection();
+        conn.setInstanceFollowRedirects(true);
         conn.setConnectTimeout(300);
         conn.setReadTimeout(900);
-        try (BufferedInputStream bis = new BufferedInputStream(conn.getInputStream())) {
-            byte[] buffer = new byte[4096];
-            int read;
-            while ((read = bis.read(buffer)) != -1)
-                md.update(buffer, 0, read);
-            return FastHex.encodeToString(md.digest());
+        try {
+            int responseCode = conn.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                throw new IOException("HTTP " + responseCode + " for URL " + artifactUrl);
+            }
+            try (DigestInputStream dis = new DigestInputStream(conn.getInputStream(), md)) {
+                final byte[] buffer = new byte[8192];
+                while (dis.read(buffer) != -1) { /* do nothing */ }
+                return FastHex.encodeToString(md.digest());
+            }
         } finally {
             md.reset();
             conn.disconnect();
