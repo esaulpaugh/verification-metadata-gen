@@ -531,7 +531,7 @@ public class ParserGenerator {
             final MessageDigest sha256 = newMessageDigest();
             String line;
             while((line = br.readLine()) != null) {
-                if(line.indexOf(") from repository MavenRepo") > 0) {
+                if(line.indexOf(") from repository MavenRepo") > 0 || line.indexOf(") from repository maven") > 0) {
                     addArtifact(line, MAVEN_CENTRAL_URL, sha256, MAVEN_ORIGIN, components);
                 } else if(line.indexOf(") from repository MavenLocal") > 0) {
                     addArtifact(line, MAVEN_CENTRAL_URL, sha256, MAVEN_ORIGIN, components);
