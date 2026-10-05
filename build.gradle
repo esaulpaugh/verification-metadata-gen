@@ -5,5 +5,16 @@ plugins {
 group 'com.esaulpaugh'
 version '0.1-SNAPSHOT'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+final int gradleMajorVersion = gradle.gradleVersion.tokenize('.')[0] as int
+
+System.out.println("gradleMajorVersion = " + gradleMajorVersion)
+
+if (gradleMajorVersion >= 5) {
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+} else {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
